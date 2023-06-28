@@ -46,7 +46,19 @@ coords2country = function(points)
   #indices$continent returns the continent (6 continent model); 
   #indices$REGION returns the continent (7 continent model).
 }
-lang_coord_full$country <- coords2country(lang_coord_full)
+coords2ISO3 = function(points)
+{  
+  countriesSP <- getMap(resolution='low')
+  pointsSP = SpatialPoints(points, proj4string=CRS(proj4string(countriesSP)))  # convert our list of points to a SpatialPoints object; setting CRS directly to that from rworldmap
+  indices = over(pointsSP, countriesSP) # use 'over' to get indices of the Polygons object containing each point
+  #indices$ADMIN # return the ADMIN names of each country
+  indices$ISO3 #returns the ISO3 code; 
+  #indices$continent returns the continent (6 continent model); 
+  #indices$REGION returns the continent (7 continent model).
+}
+lang_coord_full_raw <- lang_coord_full
+lang_coord_full$country <- coords2country(lang_coord_full_raw)
+lang_coord_full$ISO3 <- coords2ISO3(lang_coord_full_raw)
 lang_coord_full$ID <- languages$ID #replicate ID column to lang_coord_full
 lang_GB051_country <- inner_join(lang_GB051, lang_coord_full)
 lang_GB051_country_filtered <- lang_GB051_country[!(lang_GB051_country$ID %in% lang_coord_na$ID),] #remove any row with fake coordinates
