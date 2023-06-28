@@ -5,8 +5,9 @@ parameters <- read_excel("C:/Users/sphsc/OneDrive - UW/GitHub/Gendered-language/
 values <- read_excel("C:/Users/sphsc/OneDrive - UW/GitHub/Gendered-language/grambank data files/values.xlsx")
 
 #Merge grammatical gender variable with language dataframe:
+# create GB051 subset (GB051=dummy variable for sex-based grammatical gender)
 values_GB051_only <- filter(values, 
-                            values$Parameter_ID=="GB051") # create GB051 subset (GB051=dummy variable for sex-based grammatical gender)
+                            values$Parameter_ID=="GB051") 
 values_GB051_only <- subset(values_GB051_only, 
                             select = -c(ID))
 names(values_GB051_only)[names(values_GB051_only) == 'Language_ID'] <- 'ID'
@@ -14,9 +15,8 @@ lang_GB051 <- inner_join(languages, values_GB051_only)
 lang_GB051_na <- anti_join(languages, values_GB051_only) # these are excluded languages due to missing GB051 data
 
 #Add country variable based on language coordinates:
-```{r}
 lang_coord <- data.frame(languages$Longitude, languages$Latitude)
-row_coord_na <- "which(is.na(lang_coord), arr.ind=TRUE)" # these are rows with NA's in lang_coord
+row_coord_na <- which(is.na(lang_coord), arr.ind=TRUE) # these are rows with NA's in lang_coord
 lang_coord_na <- languages[row_coord_na[1:4,1], ] # data frame consisting of these rows
 lang_coord_full <- data.frame(lang_coord)
 lang_coord_full$languages.Longitude[is.na(lang_coord_full$languages.Longitude)] <- 999
@@ -32,15 +32,9 @@ coords2country = function(points)
   #indices$REGION returns the continent (7 continent model).
 }
 lang_coord_full$country <- coords2country(lang_coord_full)
-lang_coord_full$ID <- languages$ID
+lang_coord_full$ID <- languages$ID #replicate ID column to lang_coord_full
 lang_GB051_country <- inner_join(lang_GB051, lang_coord_full)
-gendlang <- subset(lang_GB051_country, 
-                   select = -c(languages.Longitude, languages.Latitude))
-#create merged dataset in local drive
-write_xlsx(gendlang, 'C:/Users/sphsc/OneDrive/Documents/gendlang.xlsx') 
-
-#Create national subsets
-table(gendlang$country, useNA = 'always')
-gendlang_Nigeria <- filter(gendlang, country=="Nigeria")
-gendlang_Uganda <- filter(gendlang, country=="Uganda") 
-```
+lang_GB051_country_filtered <- lang_GB051_country[!(lang_GB051_country$ID %in% lang_coord_na$ID),] #remove any row with fake coordinates
+gendlang <- subset(lang_GB051_country_filtered, 
+                   select = -c(languages.Longitude, languages.Latitude)) #remove duplicate coordinate columns to get final dataset
+write_xlsx(gendlang, 'C:/Users/sphsc/OneDrive/Documents/gendlang.xlsx') #create merged dataset in local drive
