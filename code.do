@@ -37,7 +37,7 @@ ssc install geoinpoly
 geoinpoly Latitude Longitude using "geo2xy_world_coor.dta"
 merge m:1 _ID using "geo2xy_world_data.dta", ///
     keep(master match) keepusing(geounit) nogen
-drop _merge country _ID
+drop _merge _ID
 rename geounit country
 
 *Save new dataset

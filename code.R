@@ -79,3 +79,13 @@ lang_GB051_GB030_country_filtered <- lang_GB051_GB030_country[!(lang_GB051_GB030
 gendlang <- subset(lang_GB051_GB030_country_filtered, 
                    select = -c(languages.Longitude, languages.Latitude)) #remove duplicate coordinate columns to get final dataset
 write_xlsx(gendlang, 'C:/Users/sphsc/OneDrive - UW/GitHub/Gendered-language/grambank raw data/gendlang.xlsx') #create merged dataset in local drive
+
+
+#Create national subsets (optional)
+table(gendlang$country, useNA = 'always')
+gendlang_Nigeria <- filter(gendlang, country=="Nigeria")
+gendlang_Uganda <- filter(gendlang, country=="Uganda")
+gendlang_Ethiopia <- filter(gendlang, country=="Ethiopia")
+gendlang_Kenya <- filter(gendlang, country=="Kenya")
+gendlang_Malawi <- filter(gendlang, country=="Malawi")
+gendlang_Tanzania <- filter(gendlang, country=="United Republic of Tanzania")
